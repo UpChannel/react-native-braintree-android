@@ -12,15 +12,21 @@ import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ActivityEventListener;
 
-public class Braintree extends ReactContextBaseJavaModule {
+
+public class Braintree extends ReactContextBaseJavaModule implements ActivityEventListener {
   private static final int PAYMENT_REQUEST = 1;
 
   private Callback successCallback;
   private Callback errorCallback;
 
+  public Activity activity;
+
   public Braintree(ReactApplicationContext reactContext) {
     super(reactContext);
+    // reactContext.addLifecycleEventListener(this);
+    reactContext.addActivityEventListener(this);
   }
 
   @Override
@@ -28,25 +34,46 @@ public class Braintree extends ReactContextBaseJavaModule {
     return "Braintree";
   }
 
+  // @Override
+  // public void onHostResume() {
+  //   Activity currentActivity = getCurrentActivity();
+  //   if (currentActivity != null) {
+  //     this.activity = currentActivity;
+  //   }
+  // }
+
   @ReactMethod
   public void paymentRequest(final String clientToken, final Callback successCallback, final Callback errorCallback) {
     this.successCallback = successCallback;
     this.errorCallback = errorCallback;
 
+    Activity currentActivity = getCurrentActivity();
+
     PaymentRequest paymentRequest = new PaymentRequest()
     .clientToken(clientToken);
 
-    ((Activity)getCurrentActivity()).startActivityForResult(
-      paymentRequest.getIntent(getCurrentActivity()),
-      PAYMENT_REQUEST
-    );
+    if (currentActivity != null) {
+      currentActivity.startActivityForResult(
+        paymentRequest.getIntent(currentActivity),
+        PAYMENT_REQUEST
+      );
+    }
+    else {
+      // try to spawn a new activity
+      // getReactApplicationContext().startActivityForResult(
+      //   paymentRequest.getIntent(getCurrentActivity()),
+      //   PAYMENT_REQUEST
+      // );
+      this.errorCallback.invoke("Error starting payments service. Please retry.");
+    }
   }
 
-  public void handleActivityResult(final int requestCode, final int resultCode, final Intent data) {
+  @Override
+  public void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
     if (requestCode == PAYMENT_REQUEST) {
       switch (resultCode) {
         case Activity.RESULT_OK:
-          PaymentMethodNonce paymentMethodNonce = data.getParcelableExtra(
+          PaymentMethodNonce paymentMethodNonce = intent.getParcelableExtra(
             BraintreePaymentActivity.EXTRA_PAYMENT_METHOD_NONCE
           );
           this.successCallback.invoke(paymentMethodNonce.getNonce());
@@ -55,7 +82,7 @@ public class Braintree extends ReactContextBaseJavaModule {
         case BraintreePaymentActivity.BRAINTREE_RESULT_SERVER_ERROR:
         case BraintreePaymentActivity.BRAINTREE_RESULT_SERVER_UNAVAILABLE:
           this.errorCallback.invoke(
-            data.getSerializableExtra(BraintreePaymentActivity.EXTRA_ERROR_MESSAGE)
+            intent.getSerializableExtra(BraintreePaymentActivity.EXTRA_ERROR_MESSAGE)
           );
           break;
         default:

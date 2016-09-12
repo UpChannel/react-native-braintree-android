@@ -21,9 +21,8 @@ public class BraintreePackage implements ReactPackage {
   @Override
   public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
     List<NativeModule> modules = new ArrayList<>();
-    mModuleInstance = new Braintree(reactContext);
 
-    modules.add(mModuleInstance);
+    modules.add(new Braintree(reactContext));
     return modules;
   }
 
@@ -35,9 +34,5 @@ public class BraintreePackage implements ReactPackage {
   @Override
   public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
     return Collections.emptyList();
-  }
-
-  public void handleActivityResult(final int requestCode, final int resultCode, final Intent data) {
-    mModuleInstance.handleActivityResult(requestCode, resultCode, data);
   }
 }
