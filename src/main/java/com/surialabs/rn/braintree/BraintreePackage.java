@@ -1,7 +1,6 @@
 package com.surialabs.rn.braintree;
 
 import android.content.Intent;
-import android.content.Context;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
@@ -14,17 +13,15 @@ import java.util.Collections;
 import java.util.List;
 
 public class BraintreePackage implements ReactPackage {
-  private Context mContext;
   private Braintree mModuleInstance;
 
-  public BraintreePackage(Context activityContext) {
-    mContext = activityContext;
+  public BraintreePackage() {
   }
 
   @Override
   public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
     List<NativeModule> modules = new ArrayList<>();
-    mModuleInstance = new Braintree(reactContext, mContext);
+    mModuleInstance = new Braintree(reactContext);
 
     modules.add(mModuleInstance);
     return modules;

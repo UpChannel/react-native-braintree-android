@@ -19,11 +19,8 @@ public class Braintree extends ReactContextBaseJavaModule {
   private Callback successCallback;
   private Callback errorCallback;
 
-  private Context mActivityContext;
-
-  public Braintree(ReactApplicationContext reactContext, Context activityContext) {
+  public Braintree(ReactApplicationContext reactContext) {
     super(reactContext);
-    this.mActivityContext = activityContext;
   }
 
   @Override
@@ -39,8 +36,8 @@ public class Braintree extends ReactContextBaseJavaModule {
     PaymentRequest paymentRequest = new PaymentRequest()
     .clientToken(clientToken);
 
-    ((Activity)this.mActivityContext).startActivityForResult(
-      paymentRequest.getIntent(this.mActivityContext),
+    ((Activity)getReactApplicationContext()).startActivityForResult(
+      paymentRequest.getIntent(getReactApplicationContext()),
       PAYMENT_REQUEST
     );
   }
