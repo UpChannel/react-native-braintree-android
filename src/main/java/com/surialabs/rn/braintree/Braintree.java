@@ -36,8 +36,8 @@ public class Braintree extends ReactContextBaseJavaModule {
     PaymentRequest paymentRequest = new PaymentRequest()
     .clientToken(clientToken);
 
-    ((Activity)getReactApplicationContext()).startActivityForResult(
-      paymentRequest.getIntent(getReactApplicationContext()),
+    ((Activity)getCurrentActivity()).startActivityForResult(
+      paymentRequest.getIntent(getCurrentActivity()),
       PAYMENT_REQUEST
     );
   }
