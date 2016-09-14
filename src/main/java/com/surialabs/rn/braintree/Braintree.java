@@ -90,4 +90,7 @@ public class Braintree extends ReactContextBaseJavaModule implements ActivityEve
       }
     }
   }
+  
+  // https://github.com/facebook/react-native/releases/tag/v0.30.0 (Native modules implementing ActivityEventListener now need to implement onNewIntent(Intent intent))
+  public void onNewIntent(Intent intent) { }
 }
